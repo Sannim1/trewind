@@ -24,7 +24,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
      *
      * @var array
      */
-    protected $fillable = ['username', 'email', 'avatar'];
+    protected $fillable = ['name', 'nickname', 'email', 'avatar'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -32,4 +32,13 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
      * @var array
      */
     protected $hidden = ['password', 'remember_token'];
+
+    /**
+     * all the credentials belonging to this user
+     * @return Illuminate\Database\Eloquent\Relations\HasManykb
+     */
+    public function credentials()
+    {
+        return $this->hasMany('App\Models\Credential');
+    }
 }
