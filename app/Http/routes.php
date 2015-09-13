@@ -11,20 +11,20 @@
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// get('/', function()
+// {
+//     if (Auth::check()) return 'Welcome back, ' . Auth::user()->username . ' ' . link_to('logout', 'Logout!');
+
+//     return 'Hi guest. ' . link_to('login/github', 'Login with Github!') . link_to('login/twitter', 'Login with twitter!');
 // });
 
-get('/', function()
-{
-    if (Auth::check()) return 'Welcome back, ' . Auth::user()->username . ' ' . link_to('logout', 'Logout!');
+// get('login/{provider}', 'AuthController@login');
 
-    return 'Hi guest. ' . link_to('login/github', 'Login with Github!') . link_to('login/twitter', 'Login with twitter!');
-});
-
-get('login/{provider}', 'AuthController@login');
-
-get('logout', function(){
-    Auth::logout();
-    return redirect('/');
-});
+// get('logout', function(){
+//     Auth::logout();
+//     return redirect('/');
+// });

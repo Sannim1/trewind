@@ -3,3 +3,7 @@
 Homestead.yaml
 Homestead.json
 .env
+/coverage
+coverage.xml1
+/build
+*.scratch
