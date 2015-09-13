@@ -2,9 +2,10 @@
 
 namespace App\Services;
 
-use App\Repositories\UserRepository;
+use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
 use App\Contracts\Auth\AuthenticateUserListener;
+use App\Contracts\Repository\UserRepositoryInterface;
 use Laravel\Socialite\Contracts\Factory as Socialite;
 
 /**
@@ -20,7 +21,11 @@ class AuthenticateUser
     protected $users;
 
 
-    public function __construct(Socialite $socialite, Guard $auth, UserRepository $users)
+    public function __construct(
+        Socialite $socialite,
+        Guard $auth,
+        UserRepositoryInterface $users
+    )
     {
         $this->socialite = $socialite;
         $this->auth = $auth;
@@ -33,11 +38,20 @@ class AuthenticateUser
      * @return void
      * @author
      **/
-    public function execute($hasCode, AuthenticateUserListener $listener)
+    public function execute(
+        array $request,
+        AuthenticateUserListener $listener,
+        $provider
+    )
     {
-        if ( ! $hasCode) return $this->getAuthorizationFirst();
+        if (! $request) {
+            return $this->getAuthorizationFirst($provider);
+        }
 
-        $user = $this->users->findByUsernameOrCreate($this->getGithubUser());
+        $user = $this->users->findUserByProviderOrCreate(
+            $provider,
+            $this->getUser($provider)
+        );
 
         $this->auth->login($user, true);
 
@@ -45,25 +59,25 @@ class AuthenticateUser
     }
 
     /**
-     * redirects to github for authorization
+     * redirects to provider for authorization
      *
      * @return void
      * @author
      **/
-    private function getAuthorizationFirst()
+    private function getAuthorizationFirst($driver)
     {
-        return $this->socialite->driver('github')->redirect();
+        return $this->socialite->driver($driver)->redirect();
     }
 
     /**
-     * gets a github user details
+     * gets a user's details from the oauth provider
      *
      * @return mixed
      * @author
      **/
-    private function getGithubUser()
+    private function getUser($driver)
     {
-        return $this->socialite->driver('github')->user();
+        return $this->socialite->driver($driver)->user();
     }
 
 

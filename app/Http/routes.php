@@ -19,10 +19,10 @@ get('/', function()
 {
     if (Auth::check()) return 'Welcome back, ' . Auth::user()->username . ' ' . link_to('logout', 'Logout!');
 
-    return 'Hi guest. ' . link_to('login', 'Login with Github!');
+    return 'Hi guest. ' . link_to('login/github', 'Login with Github!') . link_to('login/twitter', 'Login with twitter!');
 });
 
-get('login', 'AuthController@login');
+get('login/{provider}', 'AuthController@login');
 
 get('logout', function(){
     Auth::logout();
