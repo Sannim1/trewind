@@ -23,11 +23,11 @@ class CreateCredentialsTable extends Migration
 
             $table->enum('provider', ['twitter', 'github']);
             $table->unsignedInteger('provider_id');
+            $table->unique(['provider', 'provider_id']);
 
             $table->string('token');
             $table->string('token_secret');
 
-            $table->softDeletes();
             $table->timestamps();
         });
     }

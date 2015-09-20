@@ -12,6 +12,19 @@ use Laravel\Socialite\AbstractUser as SocialUser;
  **/
 interface UserRepositoryInterface
 {
+    /**
+     * get all models
+     * @param  array  $columns
+     * @return Illuminate\Database\Eloquent\Collection
+     */
+    public function getAll($columns = ['*']);
+
+    /**
+     * get a particular model by id
+     * @param  int $id
+     * @return Illuminate\Database\Eloquent\Model
+     */
+    public function getById($id);
 
     /**
      * finds a user by provider ID or create

@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Models\Credential;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\AbstractUser as SocialUser;
-use App\Contracts\Repository\RepositoryInterface;
 use App\Contracts\Repository\UserRepositoryInterface;
 use App\Contracts\Repository\CredentialRepositoryInterface;
 
@@ -16,10 +15,7 @@ use App\Contracts\Repository\CredentialRepositoryInterface;
  * @package App
  * @author Abdulmusawwir Sanni<sanniabdulmusawwir@gmail.com>
  **/
-class UserRepository
-    implements
-        RepositoryInterface,
-        UserRepositoryInterface
+class UserRepository implements UserRepositoryInterface
 {
     protected $user;
     protected $credentials;

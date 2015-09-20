@@ -3,7 +3,6 @@
 namespace App\Repositories;
 
 use App\Models\Credential;
-use App\Contracts\Repository\RepositoryInterface;
 use App\Contracts\Repository\CredentialRepositoryInterface;
 
 /**
@@ -12,36 +11,13 @@ use App\Contracts\Repository\CredentialRepositoryInterface;
  * @package App
  * @author Abdulmusawwir Sanni<sanniabdulmusawwir@gmail.com>
  **/
-class CredentialRepository
-    implements
-        RepositoryInterface,
-        CredentialRepositoryInterface
+class CredentialRepository implements CredentialRepositoryInterface
 {
     protected $credentials;
 
     public function __construct(Credential $credentials)
     {
         $this->credentials = $credentials;
-    }
-
-    /**
-     * get all models
-     * @param  array  $columns
-     * @return Illuminate\Database\Eloquent\Collection
-     */
-    public function getAll($columns = ['*'])
-    {
-        return $this->credentials->all();
-    }
-
-    /**
-     * get a particular model by id
-     * @param  int $id
-     * @return Illuminate\Database\Eloquent\Model
-     */
-    public function getById($id)
-    {
-        return $this->credentials->find($id);
     }
 
     /**
