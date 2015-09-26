@@ -34,6 +34,6 @@ class AuthController extends Controller implements AuthenticateUserListener
      **/
     public function userHasLoggedIn(User $user)
     {
-        return redirect('/');
+        return redirect('/home');
     }
 }

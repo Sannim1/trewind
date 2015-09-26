@@ -11,25 +11,20 @@
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/', function () {
+    return view('welcome');
+});
 
-Route::get('/', function()
+Route::get('/home', function()
 {
     if (Auth::check()) return 'Welcome back, ' . Auth::user()->username . ' ' . link_to('logout', 'Logout!');
 
     return 'Hi guest. ' . link_to('login/github', 'Login with Github!') . link_to('login/twitter', 'Login with twitter!');
 });
 
-// Route::get('/', [
-//     'middleware' => 'guest',
-//     'uses' => 'HomeController@index'
-// ]);
-
 Route::get('login/{provider}', 'AuthController@login');
 
 Route::get('logout', function(){
     Auth::logout();
-    return redirect('/');
+    return redirect('/home');
 });

@@ -26,7 +26,7 @@ $factory->define(User::class, function (Faker\Generator $faker) {
 $factory->define(Credential::class, function (Faker\Generator $faker) {
     return [
         'provider' => $faker->randomElement(['twitter', 'github']),
-        'provider_id' => $faker->randomNumber(6),
+        'provider_id' => $faker->randomNumber(9),
         'token' => $faker->md5($faker->randomNumber()),
         'token_secret' => bcrypt($faker->md5($faker->randomNumber())),
     ];

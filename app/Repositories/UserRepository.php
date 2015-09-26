@@ -18,12 +18,12 @@ use App\Contracts\Repository\CredentialRepositoryInterface;
 class UserRepository implements UserRepositoryInterface
 {
     protected $user;
-    protected $credentials;
+    protected $credential;
 
-    public function __construct(User $user, CredentialRepositoryInterface $credentials)
+    public function __construct(User $user, Credential $credential)
     {
         $this->user = $user;
-        $this->credentials = $credentials;
+        $this->credential = $credential;
     }
 
     /**
@@ -53,47 +53,60 @@ class UserRepository implements UserRepositoryInterface
      * @return App\Models\User
      * @author Abdulmusawwir Sanni<sanniabdulmusawwir@gmail.com>
      **/
-    public function findUserByProviderOrCreate($provider, SocialUser $userData)
+    public function findUserByProviderOrCreate(
+        $provider,
+        SocialUser $userData,
+        $authenticatedUserId=null
+    )
     {
         $providerId = $userData->id;
-        $credentials = $this->credentials->getUserCredentialByProvider(
-            $provider, $providerId
-        );
+        $credential = $this->credential->where('provider', '=', $provider)
+            ->where('provider_id', '=', $providerId)
+            ->first();
 
-        if ($credentials) {
-            // user exists, update provider credentials
+        if ($credential) {
+            // user exists, update provider credential
+            $this->credential = $credential;
             try {
-                $credentials['token'] = $userData->token;
-                $credentials['token_secret'] = $userData->tokenSecret;
+                $this->credential->token = $userData->token;
+                $this->credential->token_secret = $userData->tokenSecret;
             } catch (\Exception $e) {
                 //
             }
 
-            $credentials->save();
+            $this->credential->save();
 
-            return $this->user->find($credentials['user_id']);
+            return $this->user->find($this->credential->user_id);
         }
 
-        // fresh credentials, attach them to logged in user or create new user
-        if (Auth::id()) {
-            $user = $this->user->find(Auth::id());
+        // fresh credential, attach them to user
+        if ($authenticatedUserId) {
+            // get logged in user
+            $authenticatedUser = $this->user->find($authenticatedUserId);
+        }
+
+        if (isset($authenticatedUser)) {
+            $this->user = $authenticatedUser;
         } else {
+            // user with supplied ID doesn't exist
             // try to find user by email address
             $user = $this->findUserByEmail($userData->email);
 
-            // user email not in the system, create new user
-            if (! $user) {
-                $user = new User;
-                $user->name     = $userData->name;
-                $user->nickname = $userData->nickname;
-                $user->avatar   = $userData->avatar;
-                $user->email    = $userData->email;
+            // user with this email already exists in the system
+            if ($user) {
+                $this->user = $user;
+            } else {
+                // user not found, create new user
+                $this->user->name     = $userData->name;
+                $this->user->nickname = $userData->nickname;
+                $this->user->avatar   = $userData->avatar;
+                $this->user->email    = $userData->email;
 
-                $user->save();
+                $this->user->save();
             }
         }
 
-        // create credentials from supplied user data
+        // create new credential from supplied user data
         try {
             $token = $userData->token;
             $token_secret = $userData->tokenSecret;
@@ -102,17 +115,15 @@ class UserRepository implements UserRepositoryInterface
             if ( ! isset($token_secret)) $token_secret = '';
         }
 
-        $credentials = new Credential([
-            'provider'      =>  $provider,
-            'provider_id'   =>  $providerId,
-            'token'         =>  $token,
-            'token_secret'  =>  $token_secret,
-        ]);
+        $this->credential->provider      =  $provider;
+        $this->credential->provider_id   =  $providerId;
+        $this->credential->token         =  $token;
+        $this->credential->token_secret  =  $token_secret;
 
-        // attach credentials to user
-        $user->credentials()->save($credentials);
+        // attach credential to user
+        $this->user->credentials()->save($this->credential);
 
-        return $user;
+        return $this->user;
     }
 
     /**

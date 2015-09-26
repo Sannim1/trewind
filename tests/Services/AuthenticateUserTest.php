@@ -78,11 +78,6 @@ class ProviderStub implements Laravel\Socialite\Two\ProviderInterface
     }
 }
 
-class SocialUserStub extends Laravel\Socialite\AbstractUser
-{
-
-}
-
 class UserStub extends App\Models\User
 {
 
