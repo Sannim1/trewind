@@ -5,64 +5,66 @@ namespace spec\App\Services;
 use App\Models\User;
 use Prophecy\Argument;
 use PhpSpec\ObjectBehavior;
-use App\Repositories\UserRepository;
+use Laravel\Socialite\AbstractUser as SocialUser;
 use Illuminate\Contracts\Auth\Guard;
 use Laravel\Socialite\Contracts\Factory;
 use Laravel\Socialite\Two\ProviderInterface;
 use App\Contracts\Auth\AuthenticateUserListener;
+use App\Contracts\Repository\UserRepositoryInterface;
 
 class AuthenticateUserSpec extends ObjectBehavior
 {
-    const HAS_CODE = true;
+    // $this->authorized_request = ;
 
-    const HAS_NO_CODE = false;
-
-    function let(Factory $socialite, Guard $auth, UserRepository $users)
+    function let(Factory $socialite, Guard $auth, UserRepositoryInterface $users)
     {
         $this->beConstructedWith($socialite, $auth, $users);
     }
 
-    function it_authorizes_a_user(
+    function it_requests_authorization_from_auth_provider(
         Factory $socialite,
         ProviderInterface $provider,
         AuthenticateUserListener $listener
     )
     {
-        $provider->redirect()->shouldBeCalled();
-        $socialite->driver('github')->willReturn($provider);
+        $driver = 'dummydriver';
+        $emptyRequest = [];
 
-        $this->execute(self::HAS_NO_CODE, $listener);
+        $provider->redirect()->shouldBeCalled();
+        $socialite->driver($driver)->willReturn($provider);
+
+        $this->execute($emptyRequest, $listener, $driver);
     }
 
     function it_creates_a_user_if_authorization_is_granted(
         Factory $socialite,
-        UserRepository $users,
+        UserRepositoryInterface $users,
         Guard $auth,
         User $user,
         AuthenticateUserListener $listener
     )
     {
-        $socialite->driver('github')->willReturn(new ProviderStub);
-        $users->findByUsernameOrCreate(ProviderStub::$data)->willReturn($user);
-        $auth->login($user, self::HAS_CODE)->shouldBeCalled();
+        $provider = 'dummyprovider';
+        $authenticatedRequest = ['token' => 'dummytoken'];
+
+        $providerStub = new ProviderStub;
+
+        $socialite->driver($provider)->willReturn($providerStub);
+        $users->findUserByProviderOrCreate($provider, $providerStub->user())
+            ->willReturn($user);
+        $auth->login($user, true)->shouldBeCalled();
         $listener->userHasLoggedIn($user)->shouldBeCalled();
 
-        $this->execute(self::HAS_CODE, $listener);
+        $this->execute($authenticatedRequest, $listener, $provider);
     }
 }
 
 class ProviderStub
 {
-    public static $data = [
-        'id' => 1,
-        'nickname' => 'foo',
-        'name' => 'John Doe',
-        'email' => 'john@example.com',
-        'avatar' => 'foo.jpg'
-    ];
-
     public function user()
     {
-        return self::$data;
+        return new UserStub;
     }
 }
+
+class UserStub extends SocialUser{}

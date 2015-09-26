@@ -17,9 +17,13 @@ class AuthController extends Controller implements AuthenticateUserListener
      * @return void
      * @author Abdulmusawwir Sanni<sanniabdulmusawwir@gmail.com>
      **/
-    public function login(AuthenticateUser $authenticateUser, Request $request)
+    public function login(
+        AuthenticateUser $authenticateUser,
+        Request $request,
+        $provider = null
+    )
     {
-        return $authenticateUser->execute($request->has('code'), $this);
+        return $authenticateUser->execute($request->all(), $this, $provider);
     }
 
     /**
@@ -30,6 +34,6 @@ class AuthController extends Controller implements AuthenticateUserListener
      **/
     public function userHasLoggedIn(User $user)
     {
-        return redirect('/');
+        return redirect('/home');
     }
 }

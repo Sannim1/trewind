@@ -38,7 +38,13 @@ return [
     'github' => [
         'client_id' => env('GITHUB_CLIENT_ID'),
         'client_secret' => env('GITHUB_CLIENT_SECRET'),
-        'redirect' => 'http://trewind.dev/login',
+        'redirect' => 'http://trewindr.dev/login/github',
+    ],
+
+    'twitter' => [
+        'client_id' => env('TWITTER_API_KEY'),
+        'client_secret' => env('TWITTER_API_SECRET'),
+        'redirect' => 'http://trewindr.dev/login/twitter',
     ],
 
 ];

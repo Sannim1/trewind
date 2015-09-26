@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Credential;
+use App\Models\User;
+
 /*
 |--------------------------------------------------------------------------
 | Model Factories
@@ -11,11 +14,20 @@
 |
 */
 
-$factory->define(App\User::class, function (Faker\Generator $faker) {
+$factory->define(User::class, function (Faker\Generator $faker) {
     return [
         'name' => $faker->name,
+        'nickname' => $faker->userName,
         'email' => $faker->email,
-        'password' => bcrypt(str_random(10)),
-        'remember_token' => str_random(10),
+        'avatar' => $faker->imageUrl,
+    ];
+});
+
+$factory->define(Credential::class, function (Faker\Generator $faker) {
+    return [
+        'provider' => $faker->randomElement(['twitter', 'github']),
+        'provider_id' => $faker->randomNumber(9),
+        'token' => $faker->md5($faker->randomNumber()),
+        'token_secret' => bcrypt($faker->md5($faker->randomNumber())),
     ];
 });
